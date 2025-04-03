@@ -6,6 +6,7 @@ export const defaultSettingValues = {
   SNAP_AS_MOBILE: true,
   MY_AI_MENTIONS: true,
   PRIVATE_STORIES: true,
+  UPLOAD_SNAPS: true,
   ADS_ENABLED: false,
   ALLOW_SNAP_VIEWING: true,
   PREVENT_TYPING_NOTIFICATION: false,
