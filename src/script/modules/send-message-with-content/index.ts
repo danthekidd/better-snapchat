@@ -4,6 +4,12 @@ import { getSnapchatStore } from '../../utils/snapchat';
 
 let oldGetConversationManager: any = null;
 
+function externalMediaToSnapContent(arr: any) : any {
+    arr = arr.slice(2);
+    arr[0] = 0x5a;
+    return arr;
+}
+
 function handleStoreEffect(storeState: any) {
   if (!storeState.messaging?.client) {
     return storeState;
@@ -18,10 +24,21 @@ function handleStoreEffect(storeState: any) {
           if (prop === 'sendMessageWithContent') {
             return new Proxy(target[prop], {
                 apply(targetFunc, thisArg, args) {
-                    const enabled = settings.getSetting('SEND_UNSAVEABLE');
-                    if (enabled) {
+                    const uploadEnabled = settings.getSetting('UPLOAD_SNAPS');
+                    if (uploadEnabled) {
+                        const message = args[1];
+                        if (message.contentType === 3) {
+                            message.contentType = 1;
+                            message.savePolicy = 2;
+                            message.platformAnalytics.metricsMessageType = 3;
+                            message.content = externalMediaToSnapContent(message.content);
+                        }
+                    }
+                    const unsaveEnabled = settings.getSetting('SEND_UNSAVEABLE');
+                    if (unsaveEnabled) {
                         args[1].savePolicy = 0;
                     }
+                    
                     return Reflect.apply(targetFunc, thisArg, args);
                 },
             });
